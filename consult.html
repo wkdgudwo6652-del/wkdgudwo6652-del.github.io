@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상담 신청</title>
+  <style>
+    :root {
+      --primary: #d4af6a;
+      --primary-dark: #e8cc94;
+      --bg: #0a0a0a;
+      --card: #121110;
+      --text: #f2ede4;
+      --muted: #a39e94;
+      --border: #2e2a22;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background:
+        radial-gradient(ellipse at top, rgba(212,175,106,0.08), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* 상단 메뉴 */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1080px; margin: 0 auto; padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.2rem; color: var(--primary); letter-spacing: 0.08em; }
+    .logo img { height: 38px; width: auto; display: block; }
+    .nav ul { list-style: none; display: flex; gap: 20px; flex-wrap: wrap; }
+    .nav ul a { color: var(--muted); font-weight: 600; }
+    .nav ul a:hover, .nav ul a.active { color: var(--primary); }
+
+    /* 메인 배너 */
+    .hero {
+      background:
+        radial-gradient(circle at 50% 120%, rgba(212,175,106,0.18), transparent 60%),
+        linear-gradient(180deg, #000000, #15120d);
+      text-align: center;
+      padding: 80px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero::before {
+      content: "CONSULTATION";
+      display: block; margin-bottom: 18px;
+      font-size: 0.85rem; letter-spacing: 0.4em; color: var(--primary);
+    }
+    .hero h1 { font-size: clamp(1.7rem, 5vw, 2.4rem); margin-bottom: 12px; font-weight: 600; }
+    .hero p { font-size: 1.05rem; color: var(--muted); }
+
+    section { max-width: 720px; margin: 0 auto; padding: 60px 16px 70px; }
+
+    /* 신청 양식 */
+    .form-card {
+      background: linear-gradient(160deg, #1a1813, var(--card));
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 36px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+    .field { margin-bottom: 22px; }
+    .field > label, .field > .label {
+      display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;
+    }
+    .req { color: var(--primary); margin-left: 4px; }
+    input[type="text"], input[type="tel"], select, textarea {
+      width: 100%; padding: 12px 14px;
+      background: #0d0c0a; color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      font-size: 0.95rem; font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder { color: #6b665d; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+    textarea { min-height: 110px; resize: vertical; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .choice { display: flex; gap: 10px; flex-wrap: wrap; }
+    .choice label {
+      flex: 1; min-width: 110px; cursor: pointer; text-align: center;
+      border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px;
+      font-size: 0.95rem; transition: border-color 0.2s;
+    }
+    .choice input { position: absolute; opacity: 0; pointer-events: none; }
+    .choice label:has(input:checked) { border-color: var(--primary); background: #1c1810; color: var(--primary-dark); }
+
+    .agree { display: flex; gap: 10px; align-items: flex-start; font-size: 0.88rem; color: var(--muted); }
+    .agree input { margin-top: 5px; accent-color: var(--primary); }
+
+    .btn {
+      width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer;
+      background: linear-gradient(135deg, #e8cc94, #b8913f); color: #111;
+      font-size: 1.05rem; font-weight: 700; font-family: inherit; margin-top: 8px;
+    }
+    .btn:hover { filter: brightness(1.08); }
+    .error { color: #e58c7a; font-size: 0.88rem; margin-top: 12px; text-align: center; min-height: 1.4em; }
+
+    .done { display: none; text-align: center; padding: 20px 0; }
+    .done .check {
+      width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%;
+      border: 2px solid var(--primary); color: var(--primary);
+      display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+    }
+    .done h2 { font-size: 1.3rem; margin-bottom: 8px; font-weight: 600; }
+    .done p { color: var(--muted); }
+
+    .help { margin-top: 28px; text-align: center; color: var(--muted); font-size: 0.92rem; }
+    .help strong { color: var(--text); }
+
+    footer { text-align: center; padding: 40px 16px 30px; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--border); }
+    .footer-img {
+      display: block; width: 140px; max-width: 40%; height: auto;
+      margin: 0 auto 24px; opacity: 0.9;
+    }
+
+    @media (max-width: 600px) {
+      .nav { flex-direction: column; }
+      .hero { padding: 56px 16px; }
+      .form-card { padding: 24px; }
+      .row2 { grid-template-columns: 1fr; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="nav">
+      <a class="logo" href="index.html"><img src="logo-k.png" alt="KOREA STANDARD 로고">퍼스트 장기렌트·리스</a>
+      <ul>
+        <li><a href="index.html#service">서비스</a></li>
+        <li><a href="index.html#teams">부서 소개</a></li>
+        <li><a href="index.html#contact">연락처</a></li>
+        <li><a href="consult.html" class="active">상담 신청</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <h1>상담 신청</h1>
+    <p>남겨주신 정보로 담당자가 빠르게 연락드리겠습니다.</p>
+  </div>
+
+  <section>
+    <div class="form-card">
+      <form id="consultForm" novalidate>
+        <div class="row2">
+          <div class="field">
+            <label for="name">이름<span class="req">*</span></label>
+            <input type="text" id="name" placeholder="홍길동">
+          </div>
+          <div class="field">
+            <label for="phone">연락처<span class="req">*</span></label>
+            <input type="tel" id="phone" placeholder="010-0000-0000">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">상품 유형<span class="req">*</span></span>
+          <div class="choice">
+            <label><input type="radio" name="type" value="장기렌트" checked>장기렌트</label>
+            <label><input type="radio" name="type" value="리스">리스</label>
+            <label><input type="radio" name="type" value="상담 후 결정">상담 후 결정</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label">고객 구분</span>
+          <div class="choice">
+            <label><input type="radio" name="customer" value="개인" checked>개인</label>
+            <label><input type="radio" name="customer" value="개인사업자">개인사업자</label>
+            <label><input type="radio" name="customer" value="법인">법인</label>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="car">희망 차종</label>
+            <input type="text" id="car" placeholder="예) 그랜저, 카니발">
+          </div>
+          <div class="field">
+            <label for="period">이용 기간</label>
+            <select id="period">
+              <option>24개월</option>
+              <option>36개월</option>
+              <option selected>48개월</option>
+              <option>60개월</option>
+              <option>미정</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="time">통화 가능 시간</label>
+          <select id="time">
+            <option>언제든 가능</option>
+            <option>오전 (09:00 ~ 12:00)</option>
+            <option>오후 (13:00 ~ 18:00)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="memo">문의 내용</label>
+          <textarea id="memo" placeholder="궁금하신 점을 자유롭게 적어주세요."></textarea>
+        </div>
+
+        <div class="field">
+          <label class="agree">
+            <input type="checkbox" id="agree">
+            <span>상담을 위한 개인정보(이름, 연락처) 수집·이용에 동의합니다. 수집된 정보는 상담 목적으로만 사용됩니다.<span class="req">*</span></span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn">상담 신청하기</button>
+        <p class="error" id="error"></p>
+      </form>
+
+      <div class="done" id="done">
+        <div class="check">✓</div>
+        <h2>상담 신청이 접수되었습니다</h2>
+        <p id="doneMsg"></p>
+      </div>
+    </div>
+
+    <p class="help">급하신 문의는 <strong>대표번호 1588-0000</strong> (평일 09:00 ~ 18:00)</p>
+  </section>
+
+  <footer>
+    <img class="footer-img" src="logo-full.png" alt="KOREA STANDARD">
+    © 2026 퍼스트 장기렌트·리스 사업부. All rights reserved.
+  </footer>
+
+  <script>
+    // 예시 화면: 실제 전송은 하지 않고 접수 완료 화면만 보여줍니다.
+    document.getElementById('consultForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = document.getElementById('name').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var agree = document.getElementById('agree').checked;
+      var error = document.getElementById('error');
+
+      if (!name || !phone) { error.textContent = '이름과 연락처를 입력해 주세요.'; return; }
+      if (!/^[0-9\-\s]{9,14}$/.test(phone)) { error.textContent = '연락처를 정확히 입력해 주세요.'; return; }
+      if (!agree) { error.textContent = '개인정보 수집·이용에 동의해 주세요.'; return; }
+
+      var type = document.querySelector('input[name="type"]:checked').value;
+      document.getElementById('doneMsg').textContent =
+        name + '님, ' + type + ' 상담 신청 감사합니다. 담당자가 곧 연락드리겠습니다.';
+      this.style.display = 'none';
+      document.getElementById('done').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
